@@ -5,13 +5,13 @@ import java.util.ArrayList;
 import com.ads.tad.Command.Argument;
 import com.ads.tad.Command.Command;
 
-public class DeleteCommand extends Command {
+public class CreateCommand extends Command {
 
-    public DeleteCommand(String entity) {
+    public CreateCommand(String entity) {
         super(entity);
     }
 
-    public DeleteCommand(String entity, ArrayList<Argument> arguments) {
+    public CreateCommand(String entity, ArrayList<Argument> arguments) {
         super(entity, arguments);
     }
 }

@@ -1,5 +1,8 @@
 package com.ads.tad.Command.commands;
 
+import java.util.ArrayList;
+
+import com.ads.tad.Command.Argument;
 import com.ads.tad.Command.Command;
 
 public class ReadCommand extends Command {
@@ -8,7 +11,7 @@ public class ReadCommand extends Command {
         super(entity);
     }
 
-    public ReadCommand(String entity, String[] fields, String[] values) {
-        super(entity, fields, values);
+    public ReadCommand(String entity, ArrayList<Argument> arguments) {
+        super(entity, arguments);
     }
 }

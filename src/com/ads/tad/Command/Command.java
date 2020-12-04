@@ -1,14 +1,14 @@
 package com.ads.tad.Command;
 
+import java.util.ArrayList;
+
 public abstract class Command {
     public String entity;
-    public String[] fields = {};
-    public String[] values = {};
+    public ArrayList<Argument> arguments = new ArrayList<>();
 
-    public Command(String entity, String[] fields, String[] values) {
+    public Command(String entity, ArrayList<Argument> arguments) {
         this.entity = entity;
-        this.fields = fields;
-        this.values = values;
+        this.arguments = arguments;
     }
 
     public Command(String entity) {
@@ -24,10 +24,10 @@ public abstract class Command {
         stringBuilder.append(" [");
 
         int i = 0;
-        for (String field : fields) {
-            stringBuilder.append(String.format("%s=\"%s\"", field, values[i]));
+        for (Argument argument : arguments) {
+            stringBuilder.append(String.format("%s=\"%s\"", argument.field, argument.value));
             i++;
-            if (i < fields.length) {
+            if (i < arguments.size()) {
                 stringBuilder.append(", ");
             }
         }
@@ -35,4 +35,5 @@ public abstract class Command {
         stringBuilder.append("]");
         return stringBuilder.toString();
     }
+
 }
