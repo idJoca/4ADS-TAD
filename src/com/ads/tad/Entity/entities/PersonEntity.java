@@ -2,7 +2,7 @@ package com.ads.tad.Entity.entities;
 
 import java.util.ArrayList;
 
-import com.ads.tad.Command.Argument;
+import com.ads.tad.Helpers.Pair;
 import com.ads.tad.Entity.Entity;
 import com.ads.tad.Entity.EntityField;
 
@@ -34,12 +34,12 @@ public class PersonEntity extends Entity {
     }
 
     @Override
-    public Entity instantiate(ArrayList<Argument> arguments) {
+    public Entity instantiate(ArrayList<Pair<String, String>> arguments) {
         return new PersonEntity(getField(arguments, nameField), getField(arguments, surnameField));
     }
 
     @Override
-    public boolean filter(ArrayList<Argument> arguments) {
+    public boolean filter(ArrayList<Pair<String, String>> arguments) {
         boolean matchesArguments = true;
 
         if (hasField(arguments, nameField)) {
@@ -51,5 +51,16 @@ public class PersonEntity extends Entity {
         }
 
         return matchesArguments;
+    }
+
+    @Override
+    public void update(ArrayList<Pair<String, String>> modifierArguments) {
+        if (hasField(modifierArguments, nameField)) {
+            name = getField(modifierArguments, nameField);
+        }
+
+        if (hasField(modifierArguments, surnameField)) {
+            surname = getField(modifierArguments, surnameField);
+        }
     }
 }

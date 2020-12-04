@@ -1,4 +1,4 @@
-package com.ads.tad.Main;
+package com.ads.tad.Sample;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -22,10 +22,10 @@ public class App {
                     continue;
                 }
                 Command command = commandHandler.parseCommand(rawCommand);
-                System.out.println(command);
-                System.out.println(entityManager.handleCommand(command));
+                ArrayList<Entity> resultSet = entityManager.handleCommand(command);
+                System.out.println(resultSet);
             } catch (Exception e) {
-                System.out.println(e.getMessage());
+                e.printStackTrace();
             }
         } while (!rawCommand.toUpperCase().equals("CLOSE"));
         scanner.close();

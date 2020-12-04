@@ -1,7 +1,7 @@
 package com.ads.tad.Command;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,6 +10,7 @@ import com.ads.tad.Command.commands.CreateCommand;
 import com.ads.tad.Command.commands.DeleteCommand;
 import com.ads.tad.Command.commands.ReadCommand;
 import com.ads.tad.Command.commands.UpdateCommand;
+import com.ads.tad.Helpers.Pair;
 
 public class CommandHandler {
     public static final String[] KEYWORDS = { "CREATE", "READ", "UPDATE", "DELETE" };
@@ -32,45 +33,56 @@ public class CommandHandler {
             throw new Exception(INVALID_COMMAND_ERRROR);
         }
 
-        if (pieces[0].toUpperCase().equals(KEYWORDS[0])) {
-            return parseCreate(rawCommand, pieces);
-        } else if (pieces[0].toUpperCase().equals(KEYWORDS[1])) {
-            return parseRead(rawCommand, pieces);
-        } else if (pieces[0].toUpperCase().equals(KEYWORDS[2])) {
-            return parseUpdate(rawCommand, pieces);
-        } else if (pieces[0].toUpperCase().equals(KEYWORDS[3])) {
-            return parseDelete(rawCommand, pieces);
-        } else {
+        if (!Arrays.stream(KEYWORDS).anyMatch((keyword) -> keyword.equals(pieces[0].toUpperCase()))) {
             throw new Exception(INVALID_KEYWORD_ERRROR);
         }
+
+        Pair<ArrayList<Pair<String, String>>, ArrayList<Pair<String, String>>> pair = extractArguments(rawCommand,
+                pieces, true);
+
+        if (pieces[0].toUpperCase().equals(KEYWORDS[0])) {
+            return parseCreate(pieces[1], pair);
+        } else if (pieces[0].toUpperCase().equals(KEYWORDS[1])) {
+            return parseRead(pieces[1], pair);
+        } else if (pieces[0].toUpperCase().equals(KEYWORDS[2])) {
+            return parseUpdate(pieces[1], pair);
+        } else {
+            // Delete Command
+            return parseDelete(pieces[1], pair);
+        }
     }
 
-    private Command parseCreate(String rawCommand, String[] pieces) throws Exception {
-        return new CreateCommand(pieces[1], extractArguments(rawCommand, pieces, false).get(0));
+    private Command parseCreate(String entity,
+            Pair<ArrayList<Pair<String, String>>, ArrayList<Pair<String, String>>> pair) throws Exception {
+        return new CreateCommand(entity, pair.first, pair.second);
     }
 
-    private Command parseRead(String rawCommand, String[] pieces) throws Exception {
-        return new ReadCommand(pieces[1], extractArguments(rawCommand, pieces, false).get(0));
+    private Command parseRead(String entity,
+            Pair<ArrayList<Pair<String, String>>, ArrayList<Pair<String, String>>> pair) throws Exception {
+        return new ReadCommand(entity, pair.first, pair.second);
     }
 
-    private Command parseUpdate(String rawCommand, String[] pieces) throws Exception {
-        List<ArrayList<Argument>> pair = extractArguments(rawCommand, pieces, true);
-        return new UpdateCommand(pieces[1], pair.get(0), pair.get(1));
+    private Command parseUpdate(String entity,
+            Pair<ArrayList<Pair<String, String>>, ArrayList<Pair<String, String>>> pair) throws Exception {
+        return new UpdateCommand(entity, pair.first, pair.second);
     }
 
-    private Command parseDelete(String rawCommand, String[] pieces) throws Exception {
-        return new DeleteCommand(pieces[1], extractArguments(rawCommand, pieces, false).get(0));
+    private Command parseDelete(String entity,
+            Pair<ArrayList<Pair<String, String>>, ArrayList<Pair<String, String>>> pair) throws Exception {
+        return new DeleteCommand(entity, pair.first, pair.second);
     }
 
-    private List<ArrayList<Argument>> extractArguments(String rawCommand, String[] rawPieces, boolean hasQueryArguments)
-            throws Exception {
+    private Pair<ArrayList<Pair<String, String>>, ArrayList<Pair<String, String>>> extractArguments(String rawCommand,
+            String[] rawPieces, boolean hasQueryArguments) throws Exception {
+        ArrayList<Pair<String, String>> arguments = new ArrayList<>();
+        ArrayList<Pair<String, String>> queryArguments = new ArrayList<>();
+        Pair<ArrayList<Pair<String, String>>, ArrayList<Pair<String, String>>> pair = new Pair<>(arguments,
+                queryArguments);
+
         if (rawPieces.length < 3) {
-            return new ArrayList<>();
+            return pair;
         }
         final String pieces = rawCommand.substring(rawPieces[0].length() + rawPieces[1].length() + 2);
-
-        ArrayList<Argument> arguments = new ArrayList<>();
-        ArrayList<Argument> queryArguments = new ArrayList<>();
 
         // Matches the following:
         // a-Z="any character",a-Z="any character"
@@ -91,16 +103,12 @@ public class CommandHandler {
                     throw new Exception(
                             String.format(Locale.getDefault(), INVALID_QUERY_ARGUMENT_ERRROR, matcher.group(1)));
                 }
-                queryArguments.add(new Argument(matcher.group(1), matcher.group(2)));
+                // Removes the ':'
+                queryArguments.add(new Pair<>(matcher.group(1).substring(1), matcher.group(2)));
             } else {
-                arguments.add(new Argument(matcher.group(1), matcher.group(2)));
+                arguments.add(new Pair<>(matcher.group(1), matcher.group(2)));
             }
         }
-
-        List<ArrayList<Argument>> pair = new ArrayList<>();
-
-        pair.add(arguments);
-        pair.add(queryArguments);
 
         return pair;
     }
