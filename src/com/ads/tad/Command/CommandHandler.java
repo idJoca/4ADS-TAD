@@ -20,6 +20,22 @@ public class CommandHandler {
     public static final String INVALID_QUERY_ARGUMENT_ERRROR = "Error at argument: \"%s\". A query argument (:FIELD=\"VALUE\") is only valid on a UPDATE command.";
     public static final String[] ERRORS = { INVALID_COMMAND_ERRROR };
 
+    public ArrayList<Command> deserialize(String content) {
+        if (content == null) {
+            return null;
+        }
+
+        ArrayList<Command> commands = new ArrayList<>();
+        content.lines().forEach((command) -> {
+            try {
+                commands.add(parseCommand(command));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        return commands;
+    }
+
     /**
      * 
      * @param rawCommand
@@ -104,12 +120,16 @@ public class CommandHandler {
                             String.format(Locale.getDefault(), INVALID_QUERY_ARGUMENT_ERRROR, matcher.group(1)));
                 }
                 // Removes the ':'
-                queryArguments.add(new Pair<>(matcher.group(1).substring(1), matcher.group(2)));
+                queryArguments.add(new Pair<>(matcher.group(1).substring(1), normalize(matcher.group(2))));
             } else {
-                arguments.add(new Pair<>(matcher.group(1), matcher.group(2)));
+                arguments.add(new Pair<>(matcher.group(1), normalize(matcher.group(2))));
             }
         }
 
         return pair;
+    }
+
+    private String normalize(String value) {
+        return value.replaceAll("\\\\n", "\n");
     }
 }

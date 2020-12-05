@@ -2,10 +2,13 @@ package com.ads.tad.Entity;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.ads.tad.Command.Command;
+import com.ads.tad.Command.commands.CreateCommand;
 import com.ads.tad.Helpers.Pair;
 
 public abstract class Entity {
@@ -99,5 +102,11 @@ public abstract class Entity {
 
         stringBuilder.append("]");
         return stringBuilder.toString();
+    }
+
+    public String toCreateCommand() throws Exception {
+        return String.format(Locale.getDefault(), "create %s %s", getEntityName(),
+                getFieldPairs().stream().map((field) -> String.format(Locale.getDefault(), "%s=\"%s\"", field.first,
+                        field.second.replaceAll("\n", "\\\\n"))).collect(Collectors.joining(",")));
     }
 }

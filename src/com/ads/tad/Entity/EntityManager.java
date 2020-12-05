@@ -26,15 +26,33 @@ public class EntityManager {
     private EntityManager() {
     }
 
-    public static EntityManager getEntityManager() {
+    public static EntityManager getEntityManager(ArrayList<Command> commands, ArrayList<Entity> entities)
+            throws Exception {
         if (instance == null) {
             instance = new EntityManager();
+        }
+
+        instance.registerEntities(entities);
+        if (commands != null) {
+            for (Command command : commands) {
+                instance.handleCommand(command);
+            }
         }
         return instance;
     }
 
     public void registerEntities(ArrayList<Entity> entities) {
         this.entities = entities;
+    }
+
+    public String serialize() throws Exception {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Entity entity : resultSet) {
+            stringBuilder.append(entity.toCreateCommand() + "\n");
+        }
+
+        return stringBuilder.toString();
     }
 
     public ArrayList<Entity> handleCommand(Command command) throws Exception {

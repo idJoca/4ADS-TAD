@@ -15,7 +15,7 @@ public class CreateCommand extends Command {
     public CreateCommand(String entity, ArrayList<Pair<String, String>> modifierArguments,
             ArrayList<Pair<String, String>> queryArguments) throws Exception {
         super(entity, modifierArguments, queryArguments);
-        if (queryArguments.size() > 0) {
+        if (queryArguments != null && queryArguments.size() > 0) {
             throw new Exception(String.format(Locale.getDefault(), INVALID_TYPE_QUERY_ARGUMENT_ERROR, "CREATE"));
         }
     }

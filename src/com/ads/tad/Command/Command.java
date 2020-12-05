@@ -31,11 +31,13 @@ public abstract class Command {
         stringBuilder.append(" [");
 
         int i = 0;
-        for (Pair<String, String> argument : modifierArguments) {
-            stringBuilder.append(String.format("%s=\"%s\"", argument.first, argument.second));
-            i++;
-            if (i < modifierArguments.size()) {
-                stringBuilder.append(", ");
+        if (modifierArguments != null) {
+            for (Pair<String, String> argument : modifierArguments) {
+                stringBuilder.append(String.format("%s=\"%s\"", argument.first, argument.second));
+                i++;
+                if (i < modifierArguments.size()) {
+                    stringBuilder.append(", ");
+                }
             }
         }
 
@@ -43,11 +45,13 @@ public abstract class Command {
         stringBuilder.append(" [");
 
         i = 0;
-        for (Pair<String, String> argument : queryArguments) {
-            stringBuilder.append(String.format("%s=\"%s\"", argument.first, argument.second));
-            i++;
-            if (i < modifierArguments.size()) {
-                stringBuilder.append(", ");
+        if (queryArguments != null) {
+            for (Pair<String, String> argument : queryArguments) {
+                stringBuilder.append(String.format("%s=\"%s\"", argument.first, argument.second));
+                i++;
+                if (i < modifierArguments.size()) {
+                    stringBuilder.append(", ");
+                }
             }
         }
 

@@ -15,7 +15,7 @@ public class ReadCommand extends Command {
     public ReadCommand(String entity, ArrayList<Pair<String, String>> modifierArguments,
             ArrayList<Pair<String, String>> queryArguments) throws Exception {
         super(entity, modifierArguments, queryArguments);
-        if (modifierArguments.size() > 0) {
+        if (modifierArguments != null && modifierArguments.size() > 0) {
             throw new Exception(String.format(Locale.getDefault(), INVALID_TYPE_MODIFIER_ARGUMENT_ERROR, "READ"));
         }
     }
