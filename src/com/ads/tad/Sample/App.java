@@ -7,6 +7,7 @@ import com.ads.tad.Command.Command;
 import com.ads.tad.Command.CommandHandler;
 import com.ads.tad.Entity.Entity;
 import com.ads.tad.Entity.EntityManager;
+import com.ads.tad.Entity.entities.ApartmentEntity;
 import com.ads.tad.Entity.entities.PersonEntity;
 import com.ads.tad.Helpers.FileHelper;
 
@@ -55,6 +56,7 @@ public class App {
         ArrayList<Entity> entities = new ArrayList<>();
 
         entities.add(new PersonEntity());
+        entities.add(new ApartmentEntity());
 
         EntityManager entityManager = EntityManager.getEntityManager(commands, entities);
 
