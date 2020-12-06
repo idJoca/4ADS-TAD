@@ -12,6 +12,7 @@ import com.ads.tad.Helpers.FileHelper;
 
 public class App {
     public static final String PREFIX = "ENTITIES";
+    public static final boolean DEBUG = false;
 
     public static void main(String[] args) {
         String content = null;
@@ -40,7 +41,11 @@ public class App {
                 ArrayList<Entity> resultSet = entityManager.handleCommand(command);
                 System.out.println(resultSet);
             } catch (Exception e) {
-                e.printStackTrace();
+                if (DEBUG) {
+                    e.printStackTrace();
+                } else {
+                    System.out.println(e.getLocalizedMessage());
+                }
             }
         } while (true);
         scanner.close();

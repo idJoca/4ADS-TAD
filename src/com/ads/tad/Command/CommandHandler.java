@@ -2,7 +2,6 @@ package com.ads.tad.Command;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,10 +14,8 @@ import com.ads.tad.Helpers.Pair;
 public class CommandHandler {
     public static final String[] KEYWORDS = { "CREATE", "READ", "UPDATE", "DELETE" };
     public static final String INVALID_KEYWORD_ERRROR = "Invalid keyword.";
-    public static final String INVALID_COMMAND_ERRROR = "The command does not have a valid syntax. Should be: KEYWORD ENTITY [,FIELD=\"VALUE\",...]";
-    public static final String INVALID_ARGUMENT_ERRROR = "The argument does not have a valid syntax. Should be: KEYWORD ENTITY [,FIELD=\"VALUE\",...]";
-    public static final String INVALID_QUERY_ARGUMENT_ERRROR = "Error at argument: \"%s\". A query argument (:FIELD=\"VALUE\") is only valid on a UPDATE command.";
-    public static final String[] ERRORS = { INVALID_COMMAND_ERRROR };
+    public static final String INVALID_COMMAND_ERRROR = "The command does not have a valid syntax. Should be: KEYWORD ENTITY [,FIELD|:FIELD=\"VALUE\",...]";
+    public static final String INVALID_ARGUMENT_ERRROR = "The argument does not have a valid syntax. Should be: KEYWORD ENTITY [,FIELD|:FIELD=\"VALUE\",...]";
 
     public ArrayList<Command> deserialize(String content) {
         if (content == null) {
@@ -54,7 +51,7 @@ public class CommandHandler {
         }
 
         Pair<ArrayList<Pair<String, String>>, ArrayList<Pair<String, String>>> pair = extractArguments(rawCommand,
-                pieces, true);
+                pieces);
 
         if (pieces[0].toUpperCase().equals(KEYWORDS[0])) {
             return parseCreate(pieces[1], pair);
@@ -89,7 +86,7 @@ public class CommandHandler {
     }
 
     private Pair<ArrayList<Pair<String, String>>, ArrayList<Pair<String, String>>> extractArguments(String rawCommand,
-            String[] rawPieces, boolean hasQueryArguments) throws Exception {
+            String[] rawPieces) throws Exception {
         ArrayList<Pair<String, String>> arguments = new ArrayList<>();
         ArrayList<Pair<String, String>> queryArguments = new ArrayList<>();
         Pair<ArrayList<Pair<String, String>>, ArrayList<Pair<String, String>>> pair = new Pair<>(arguments,
@@ -115,10 +112,6 @@ public class CommandHandler {
                 throw new Exception(INVALID_KEYWORD_ERRROR);
             }
             if (matcher.group(1).substring(0, 1).equals(":")) {
-                if (!hasQueryArguments) {
-                    throw new Exception(
-                            String.format(Locale.getDefault(), INVALID_QUERY_ARGUMENT_ERRROR, matcher.group(1)));
-                }
                 // Removes the ':'
                 queryArguments.add(new Pair<>(matcher.group(1).substring(1), normalize(matcher.group(2))));
             } else {
