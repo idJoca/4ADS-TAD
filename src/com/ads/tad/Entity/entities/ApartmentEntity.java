@@ -10,16 +10,17 @@ import com.ads.tad.Helpers.Pair;
 
 public class ApartmentEntity extends Entity {
 
-    public String number, floor, name, building;
+    public String name, number, floor, building;
 
     private EntityField nameField = new EntityField("name", true, true), numberField = new EntityField("number", true),
             floorField = new EntityField("floor", true);
-    private RelationField buildingField = new RelationField("building", new BuildingEntity(), false);
+    private RelationField buildingField = new RelationField("building", new BuildingEntity(), true);
 
-    public ApartmentEntity(String number, String floor, String name) {
+    public ApartmentEntity(String name, String number, String floor, String building) {
+        this.name = name;
         this.number = number;
         this.floor = floor;
-        this.name = name;
+        this.building = building;
     }
 
     public ApartmentEntity() {
@@ -34,8 +35,8 @@ public class ApartmentEntity extends Entity {
 
     @Override
     public Entity instantiate(ArrayList<Pair<String, String>> modifierArguments) {
-        return new ApartmentEntity(getField(modifierArguments, numberField), getField(modifierArguments, floorField),
-                getField(modifierArguments, nameField));
+        return new ApartmentEntity(getField(modifierArguments, nameField), getField(modifierArguments, numberField),
+                getField(modifierArguments, floorField), getField(modifierArguments, buildingField));
     }
 
     @Override
@@ -45,7 +46,11 @@ public class ApartmentEntity extends Entity {
         }
         boolean matchesArguments = true;
 
-        if (hasField(queryArguments, numberField)) {
+        if (hasField(queryArguments, nameField)) {
+            matchesArguments = name.contains(getField(queryArguments, nameField));
+        }
+
+        if (matchesArguments && hasField(queryArguments, numberField)) {
             matchesArguments = number.contains(getField(queryArguments, numberField));
         }
 
@@ -53,17 +58,29 @@ public class ApartmentEntity extends Entity {
             matchesArguments = floor.contains(getField(queryArguments, floorField));
         }
 
+        if (matchesArguments && hasField(queryArguments, buildingField)) {
+            matchesArguments = building.contains(getField(queryArguments, buildingField));
+        }
+
         return matchesArguments;
     }
 
     @Override
     public void update(ArrayList<Pair<String, String>> modifierArguments) {
+        if (hasField(modifierArguments, nameField)) {
+            name = getField(modifierArguments, nameField);
+        }
+
         if (hasField(modifierArguments, numberField)) {
             number = getField(modifierArguments, numberField);
         }
 
         if (hasField(modifierArguments, floorField)) {
             floor = getField(modifierArguments, floorField);
+        }
+
+        if (hasField(modifierArguments, buildingField)) {
+            building = getField(modifierArguments, buildingField);
         }
 
     }

@@ -145,21 +145,20 @@ public class EntityManager {
             // Get the relation arguments fields from the target entity
             return entity.get().getEntityFields().stream().anyMatch((field) -> {
                 // Get the existing entities that matches the relation constraint
-                return field instanceof RelationField
-                        && argument.first.equals(field.name) && field.required && !argument.second
-                                .isEmpty()
-                        && resultSet.stream().anyMatch((result) -> {
-                            // Check the entity fields for it's main key
-                            return result.getClass().equals(((RelationField) field).relation
-                                    .getClass()) && result.getEntityFields().stream().anyMatch(
-                                            (entityField) -> {
-                                                // Check if the Main Key value matches the argument provided
-                                                return entityField instanceof EntityField
-                                                        && ((EntityField) entityField).mainField
-                                                        && !result.getFieldByName(entityField.name)
-                                                                .equals(argument.second);
-                                            });
-                        });
+                return field instanceof RelationField && argument.first.equals(field.name) && field.required
+                        && !argument.second.isEmpty()
+                        && Optional.of((ArrayList<Entity>) resultSet.stream().filter((result) -> {
+                            return result.getClass().equals(((RelationField) field).relation.getClass());
+                        }).collect(Collectors.toList())).map((result) -> {
+                            return result.size() == 0 || result.stream().anyMatch((resultStream) -> {
+                                // Check the entity fields for it's main key
+                                return resultStream.getEntityFields().stream().anyMatch((entityField) -> {
+                                    // Check if the Main Key value matches the argument provided
+                                    return entityField instanceof EntityField && ((EntityField) entityField).mainField
+                                            && !resultStream.getFieldByName(entityField.name).equals(argument.second);
+                                });
+                            });
+                        }).get();
             });
         }).map((argument) -> String.format(Locale.getDefault(), "%s=\"%s\"", argument.first, argument.second))
                 .collect(Collectors.joining(", "));

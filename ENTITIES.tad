@@ -1,2 +1,3 @@
-create apartment number="01",floor="01",building="",name="AP 01"
+create building name="P01",address="There",number="01"
+create apartment number="01",floor="01",building="P01",name="AP 01"
 create person name="Joao",surname="Braz",apartment="AP 01"
