@@ -1,4 +1,2 @@
-create person name="Joao",surname="Pedro"
-create person name="oie\nJoao",surname="Braz"
-create apartment number="6",floor="2"
-create apartment number="2",floor="1"
+create apartment number="01",floor="01",building="",name="AP 01"
+create person name="Joao",surname="Braz",apartment="AP 01"

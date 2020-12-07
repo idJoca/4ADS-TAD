@@ -8,12 +8,13 @@ import com.ads.tad.Command.CommandHandler;
 import com.ads.tad.Entity.Entity;
 import com.ads.tad.Entity.EntityManager;
 import com.ads.tad.Entity.entities.ApartmentEntity;
+import com.ads.tad.Entity.entities.BuildingEntity;
 import com.ads.tad.Entity.entities.PersonEntity;
 import com.ads.tad.Helpers.FileHelper;
 
 public class App {
     public static final String PREFIX = "ENTITIES";
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     public static void main(String[] args) {
         String content = null;
@@ -31,7 +32,7 @@ public class App {
         do {
             try {
                 rawCommand = scanner.nextLine();
-                if (rawCommand == null) {
+                if (rawCommand == null || rawCommand.isEmpty()) {
                     continue;
                 }
                 if (rawCommand.toUpperCase().equals("CLOSE")) {
@@ -57,6 +58,7 @@ public class App {
 
         entities.add(new PersonEntity());
         entities.add(new ApartmentEntity());
+        entities.add(new BuildingEntity());
 
         EntityManager entityManager = EntityManager.getEntityManager(commands, entities);
 

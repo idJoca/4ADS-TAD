@@ -1,22 +1,22 @@
 package com.ads.tad.Entity;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.ads.tad.Helpers.Normalizer;
 import com.ads.tad.Helpers.Pair;
 
 public abstract class Entity {
 
-    protected static String getField(ArrayList<Pair<String, String>> arguments, EntityField field) {
+    protected static String getField(ArrayList<Pair<String, String>> arguments, Field field) {
         Optional<Pair<String, String>> argument = arguments.stream()
                 .filter((element) -> element.first.equals(field.name)).findFirst();
         return argument.isPresent() ? argument.get().second : field.defaultValue;
     }
 
-    protected static boolean hasField(ArrayList<Pair<String, String>> arguments, EntityField field) {
+    protected static boolean hasField(ArrayList<Pair<String, String>> arguments, Field field) {
         return arguments.stream().filter((element) -> element.first.equals(field.name)).findFirst().isPresent();
     }
 
@@ -24,11 +24,11 @@ public abstract class Entity {
 
     public abstract Entity instantiate(ArrayList<Pair<String, String>> modifierArguments);
 
-    public abstract boolean filter(ArrayList<Pair<String, String>> queryArguments);
+    public abstract boolean filter(Entity wantedEntity, ArrayList<Pair<String, String>> queryArguments);
 
     public abstract void update(ArrayList<Pair<String, String>> modifierArguments);
 
-    protected abstract ArrayList<EntityField> getEntityFields();
+    protected abstract ArrayList<Field> getEntityFields();
 
     /**
      * Validate the arguments, by returning the fields that do not match the ones in
@@ -56,22 +56,19 @@ public abstract class Entity {
      * @param modifierArguments
      * @return
      */
-    public String[] validateMissingRequiredArguments(ArrayList<Pair<String, String>> modifierArguments) {
-        return this.getEntityFields().stream()
+    public ArrayList<Field> validateMissingRequiredArguments(ArrayList<Pair<String, String>> modifierArguments) {
+        return (ArrayList<Field>) this.getEntityFields().stream()
                 .filter((entityField) -> entityField.required
                         && !modifierArguments.stream().anyMatch((argument) -> entityField.name.equals(argument.first)))
-                .map((entityField) -> entityField.name).toArray(String[]::new);
+                .collect(Collectors.toList());
     }
 
     public ArrayList<Pair<String, String>> getFieldPairs() {
         ArrayList<Pair<String, String>> fieldPairs = new ArrayList<>();
-        for (EntityField entityField : getEntityFields()) {
-            Field field;
+        for (Field entityField : getEntityFields()) {
             try {
-                field = getClass().getDeclaredField(entityField.name);
-                field.setAccessible(true);
-                fieldPairs.add(new Pair<>(entityField.name, (String) field.get(this)));
-            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+                fieldPairs.add(new Pair<>(entityField.name, getFieldByName(entityField.name)));
+            } catch (IllegalArgumentException | SecurityException e) {
                 e.printStackTrace();
             }
         }
@@ -104,6 +101,17 @@ public abstract class Entity {
     public String toCreateCommand() throws Exception {
         return String.format(Locale.getDefault(), "create %s %s", getEntityName(),
                 getFieldPairs().stream().map((field) -> String.format(Locale.getDefault(), "%s=\"%s\"", field.first,
-                        field.second.replaceAll("\n", "\\\\n"))).collect(Collectors.joining(",")));
+                        Normalizer.normalize(field.second))).collect(Collectors.joining(",")));
+    }
+
+    public String getFieldByName(String name) {
+        try {
+            java.lang.reflect.Field field = getClass().getDeclaredField(name);
+            field.setAccessible(true);
+            return (String) field.get(this);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

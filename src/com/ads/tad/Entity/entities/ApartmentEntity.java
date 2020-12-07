@@ -3,17 +3,23 @@ package com.ads.tad.Entity.entities;
 import java.util.ArrayList;
 
 import com.ads.tad.Entity.Entity;
-import com.ads.tad.Entity.EntityField;
+import com.ads.tad.Entity.Field;
+import com.ads.tad.Entity.fields.EntityField;
+import com.ads.tad.Entity.fields.RelationField;
 import com.ads.tad.Helpers.Pair;
 
 public class ApartmentEntity extends Entity {
 
-    public String number, floor;
-    private EntityField numberField = new EntityField("number", true), floorField = new EntityField("floor", true);
+    public String number, floor, name, building;
 
-    public ApartmentEntity(String number, String floor) {
+    private EntityField nameField = new EntityField("name", true, true), numberField = new EntityField("number", true),
+            floorField = new EntityField("floor", true);
+    private RelationField buildingField = new RelationField("building", new BuildingEntity(), false);
+
+    public ApartmentEntity(String number, String floor, String name) {
         this.number = number;
         this.floor = floor;
+        this.name = name;
     }
 
     public ApartmentEntity() {
@@ -28,11 +34,15 @@ public class ApartmentEntity extends Entity {
 
     @Override
     public Entity instantiate(ArrayList<Pair<String, String>> modifierArguments) {
-        return new ApartmentEntity(getField(modifierArguments, numberField),getField(modifierArguments, floorField));
+        return new ApartmentEntity(getField(modifierArguments, numberField), getField(modifierArguments, floorField),
+                getField(modifierArguments, nameField));
     }
 
     @Override
-    public boolean filter(ArrayList<Pair<String, String>> queryArguments) {
+    public boolean filter(Entity wantedEntity, ArrayList<Pair<String, String>> queryArguments) {
+        if (!wantedEntity.getClass().equals(getClass())) {
+            return false;
+        }
         boolean matchesArguments = true;
 
         if (hasField(queryArguments, numberField)) {
@@ -51,6 +61,7 @@ public class ApartmentEntity extends Entity {
         if (hasField(modifierArguments, numberField)) {
             number = getField(modifierArguments, numberField);
         }
+
         if (hasField(modifierArguments, floorField)) {
             floor = getField(modifierArguments, floorField);
         }
@@ -58,11 +69,13 @@ public class ApartmentEntity extends Entity {
     }
 
     @Override
-    protected ArrayList<EntityField> getEntityFields() {
-        ArrayList<EntityField> fields = new ArrayList<>();
+    protected ArrayList<Field> getEntityFields() {
+        ArrayList<Field> fields = new ArrayList<>();
 
         fields.add(numberField);
         fields.add(floorField);
+        fields.add(buildingField);
+        fields.add(nameField);
 
         return fields;
     }

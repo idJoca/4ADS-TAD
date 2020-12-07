@@ -9,6 +9,7 @@ import com.ads.tad.Command.commands.CreateCommand;
 import com.ads.tad.Command.commands.DeleteCommand;
 import com.ads.tad.Command.commands.ReadCommand;
 import com.ads.tad.Command.commands.UpdateCommand;
+import com.ads.tad.Helpers.Normalizer;
 import com.ads.tad.Helpers.Pair;
 
 public class CommandHandler {
@@ -113,16 +114,12 @@ public class CommandHandler {
             }
             if (matcher.group(1).substring(0, 1).equals(":")) {
                 // Removes the ':'
-                queryArguments.add(new Pair<>(matcher.group(1).substring(1), normalize(matcher.group(2))));
+                queryArguments.add(new Pair<>(matcher.group(1).substring(1), Normalizer.normalize(matcher.group(2))));
             } else {
-                arguments.add(new Pair<>(matcher.group(1), normalize(matcher.group(2))));
+                arguments.add(new Pair<>(matcher.group(1), Normalizer.normalize(matcher.group(2))));
             }
         }
 
         return pair;
-    }
-
-    private String normalize(String value) {
-        return value.replaceAll("\\\\n", "\n");
     }
 }
